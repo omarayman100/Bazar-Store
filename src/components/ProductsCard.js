@@ -1,85 +1,107 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { BsArrowRight } from "react-icons/bs";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { MdOutlineStar } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/bazarSlice";
 import { ToastContainer, toast } from "react-toastify";
 
-const ProductsCard = ({ product }) => {
+const Product = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const _id = product.title;
-  const idString = (_id) => {
-    return String(_id).toLowerCase().split(" ").join("");
-  };
-  const rootId = idString(_id);
-
-  const handleDetails = () => {
-    navigate(`/product/${rootId}`, {
-      state: {
-        item: product,
-      },
-    });
-  };
+  const [details, setDetails] = useState({});
+  let [baseQty, setBaseQty] = useState(1);
+  const location = useLocation();
+  useEffect(() => {
+    setDetails(location.state.item);
+  }, [location]);
 
   return (
-    <div className="w-full relative group">
-      <div
-        onClick={handleDetails}
-        className="w-full h-72 md:h-96 cursor-pointer overflow-hidden"
-      >
-        <img
-          className="w-full h-full object-cover group-hover:scale-110 duration-500"
-          src={product.image}
-          alt="productImg"
-        />
-      </div>
-      <div className="w-full border-[1px] px-2 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-2 md:mb-0">
-            <h2 className="font-titleFont text-base font-bold">
-              {product.title.substring(0, 15)}
-            </h2>
-            <p className="text-sm text-gray-500">{product.category}</p>
+    <div className="overflow-hidden">
+      <div className="max-w-screen-xl mx-auto my-10 flex flex-col gap-10 sm:flex-row">
+        <div className="w-full sm:w-2/5 relative">
+          <img
+            className="w-full h-[550px] object-cover"
+            src={details.image}
+            alt="productImg"
+          />
+          <div className="absolute top-4 right-0">
+            {details.isNew && (
+              <p className="bg-black text-white font-semibold font-titleFont px-8 py-1">
+                Sale
+              </p>
+            )}
           </div>
-          <div className="text-sm w-full md:w-28 flex justify-between items-center mt-2 md:mt-0">
-            <div className="flex gap-2 transform group-hover:translate-x-24 transition-transform duration-500">
-              <p className="line-through text-gray-500">${product.oldPrice}</p>
-              <p className="font-semibold">${product.price}</p>
+        </div>
+        <div className="w-full sm:w-3/5 flex flex-col justify-center gap-12">
+          <div>
+            <h2 className="text-4xl font-semibold">{details.title}</h2>
+            <div className="flex items-center gap-4 mt-3">
+              <p className="line-through font-base text-gray-500">
+                ${details.oldPrice}
+              </p>
+              <p className="text-2xl font-medium text-gray-900">
+                ${details.price}
+              </p>
             </div>
-            <p
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex text-base">
+              <MdOutlineStar />
+              <MdOutlineStar />
+              <MdOutlineStar />
+              <MdOutlineStar />
+              <MdOutlineStar />
+            </div>
+            <p className="text-xs text-gray-500">(1 Customer review)</p>
+          </div>
+          <p className="text-base text-gray-500 -mt-3">{details.description}</p>
+          <div className="flex gap-4">
+            <div className="w-52 flex items-center justify-between text-gray-500 gap-4 border p-3">
+              <p className="text-sm">Quantity</p>
+              <div className="flex items-center gap-4 text-sm font-semibold">
+                <button
+                  onClick={() =>
+                    setBaseQty(baseQty === 1 ? (baseQty = 1) : baseQty - 1)
+                  }
+                  className="border h-5 font-normal text-lg flex items-center justify-center px-2 hover:bg-gray-700 hover:text-white cursor-pointer duration-300 active:bg-black"
+                >
+                  -
+                </button>
+                {baseQty}
+                <button
+                  onClick={() => setBaseQty(baseQty + 1)}
+                  className="border h-5 font-normal text-lg flex items-center justify-center px-2 hover:bg-gray-700 hover:text-white cursor-pointer duration-300 active:bg-black"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <button
               onClick={() =>
                 dispatch(
                   addToCart({
-                    _id: product._id,
-                    title: product.title,
-                    image: product.image,
-                    price: product.price,
-                    quantity: 1,
-                    description: product.description,
+                    _id: details._id,
+                    title: details.title,
+                    image: details.image,
+                    price: details.price,
+                    quantity: baseQty,
+                    description: details.description,
                   })
-                ) & toast.success(`${product.title} is added`)
+                ) & toast.success(`${details.title} is added`)
               }
-              className="absolute z-20 w-full md:w-[100px] text-gray-500 hover:text-gray-900 flex items-center justify-center gap-1 top-0 md:top-auto left-0 md:left-auto transform -translate-x-0 md:translate-x-32 group-hover:translate-x-0 transition-transform cursor-pointer duration-500"
+              className="bg-black text-white py-3 px-6 active:bg-gray-800"
             >
               add to cart
-              <span>
-                <BsArrowRight />
-              </span>
-            </p>
+            </button>
           </div>
-        </div>
-      </div>
-      <div className="absolute top-4 right-0">
-        {product.isNew && (
-          <p className="bg-black text-white font-semibold font-titleFont px-6 py-1">
-            Sale
+          <p className="text-base text-gray-500">
+            Category:{" "}
+            <span className="font-medium capitalize">{details.category}</span>
           </p>
-        )}
+        </div>
       </div>
       <ToastContainer
         position="top-left"
-        autoClose={3000}
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -93,4 +115,4 @@ const ProductsCard = ({ product }) => {
   );
 };
 
-export default ProductsCard;
+export default Product;
