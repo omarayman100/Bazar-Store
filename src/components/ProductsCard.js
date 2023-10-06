@@ -7,17 +7,17 @@ import { ToastContainer, toast } from "react-toastify";
 
 const Product = () => {
   const dispatch = useDispatch();
-  const [details, setDetails] = useState({});
+  const [details, Details] = useState({});
   let [baseQty, setBaseQty] = useState(1);
   const location = useLocation();
   useEffect(() => {
-    setDetails(location.state.item);
+    Details(location.state.item);
   }, [location]);
 
   return (
-    <div className="overflow-hidden">
-      <div className="max-w-screen-xl mx-auto my-10 flex flex-col gap-10 sm:flex-row">
-        <div className="w-full sm:w-2/5 relative">
+    <div>
+      <div className="max-w-screen-xl mx-auto my-10 flex gap-10">
+        <div className="w-2/5 relative">
           <img
             className="w-full h-[550px] object-cover"
             src={details.image}
@@ -31,7 +31,7 @@ const Product = () => {
             )}
           </div>
         </div>
-        <div className="w-full sm:w-3/5 flex flex-col justify-center gap-12">
+        <div className="w-3/5 flex flex-col justify-center gap-12">
           <div>
             <h2 className="text-4xl font-semibold">{details.title}</h2>
             <div className="flex items-center gap-4 mt-3">
